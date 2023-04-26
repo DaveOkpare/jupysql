@@ -911,6 +911,18 @@ def test_close_connection_with_custom_connection_and_alias(ip, tmp_empty):
     assert "second" not in Connection.connections
 
 
+def test_creator_no_argument_raises(ip):
+    result = ip.run_cell("%sql --creator")
+    assert isinstance(result.error_in_exec, UsageError)
+
+
+def test_creator(ip):
+    ip.user_global_ns["my_engine"] = create_engine("sqlite:///my.db")
+    result = ip.run_cell("%sql --creator my_engine")
+    assert not isinstance(result.error_in_exec, UsageError)
+    assert not isinstance(result.error_in_exec, KeyError)
+
+
 def test_column_names_visible(ip, tmp_empty):
     res = ip.run_line_magic("sql", "SELECT * FROM empty_table")
 
